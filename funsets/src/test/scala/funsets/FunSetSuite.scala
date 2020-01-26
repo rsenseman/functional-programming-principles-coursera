@@ -38,16 +38,18 @@ class FunSetSuite {
     val s1 = singletonSet(1)
     val s2 = singletonSet(2)
     val s3 = singletonSet(3)
+    val s4 = (x:Int) => (x < 5) && (x > -5)
+    val s5 = (x:Int) => (x < 10) && (x > 0)
   }
 
   /**
    * This test is currently disabled (by using @Ignore) because the method
    * "singletonSet" is not yet implemented and the test would fail.
    *
-   * Once you finish your implementation of "singletonSet", remvoe the
+   * Once you finish your implementation of "singletonSet", remove the
    * @Ignore annotation.
    */
-  @Ignore("not ready yet") @Test def `singleton set one contains one`: Unit = {
+  @Test def `singleton set one contains one`: Unit = {
 
     /**
      * We create a new instance of the "TestSets" trait, this gives us access
@@ -64,12 +66,40 @@ class FunSetSuite {
 
   @Test def `union contains all elements of each set`: Unit = {
     new TestSets {
-      val s = union(s1, s2)
-      assert(contains(s, 1), "Union 1")
-      assert(contains(s, 2), "Union 2")
-      assert(!contains(s, 3), "Union 3")
+      val s = union(s4, s5)
+      assert(contains(s, 3), "Union 1")
+      assert(contains(s, -3), "Union 2")
+      assert(!contains(s, 10), "Union 3")
     }
   }
+
+  @Test def `intersect contains elements in both sets`: Unit = {
+    new TestSets {
+      val s = intersect(s4, s5)
+      assert(contains(s, 3), "Intersect 1")
+      assert(!contains(s, -3), "Intersect 2")
+      assert(!contains(s, 7), "Intersect 3")
+    }
+  }
+
+  @Test def `diff contains elements in set_A and not in set_B`: Unit = {
+    new TestSets {
+      val s = diff(s4, s5)
+      assert(contains(s, -3), "Diff 1")
+      assert(!contains(s, 3), "Diff 2")
+      assert(!contains(s, 7), "Diff 3")
+    }
+  }
+
+  @Test def `filter works`: Unit = {
+    new TestSets {
+      val s = filter(s4, (x: Int) => x % 2 == 0)
+      assert(contains(s, 2), "Filter 1")
+      assert(contains(s, 4), "Filter 2")
+      assert(!contains(s, 3), "Filter 3")
+    }
+  }
+
 
 
 
