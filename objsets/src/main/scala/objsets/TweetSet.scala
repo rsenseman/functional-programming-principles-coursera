@@ -78,7 +78,7 @@ abstract class TweetSet extends TweetSetInterface {
    * Question: Should we implment this method here, or should it remain abstract
    * and be implemented in the subclasses?
    */
-  def descendingByRetweet: TweetList = ???
+  def descendingByRetweet: TweetList
 
   /**
    * The following methods are already implemented
@@ -124,12 +124,16 @@ class Empty extends TweetSet {
   def foreach(f: Tweet => Unit): Unit = ()
 
   def mostRetweeted: Tweet = throw new NoSuchElementException("Empty list")
+
+  def descendingByRetweet: TweetList = Nil
 }
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
+    println(acc)
     this.foreach((x) => if (p(x) && !acc.contains(x)) acc.incl(x))
+    println(acc)
     acc
   }
 
@@ -161,11 +165,43 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   }
 
   def mostRetweeted: Tweet = {
-    var topTweet = new Tweet("", "", 0)
-    this.foreach((x) => {
-      if (x.retweets > topTweet.retweets) topTweet = x
-    })
-    topTweet
+    def getBestTweet(a: Tweet, b:Tweet) = if (a.retweets > b.retweets) a else b
+
+    if (left.isInstanceOf[NonEmpty]) {
+      val leftMost = left.mostRetweeted
+
+      // case when both left and right are non-empty
+      if (right.isInstanceOf[NonEmpty]) {
+        val rightMost = right.mostRetweeted
+
+        // case when right > left
+        if (rightMost.retweets > leftMost.retweets)
+          getBestTweet(rightMost, elem)
+
+        // case when right < left
+        else
+          getBestTweet(leftMost, elem)
+
+      // case when only left is non-empty
+      } else {
+        getBestTweet(leftMost, elem)
+      }
+    // case when only right is non-empty
+    } else if (right.isInstanceOf[NonEmpty]) {
+      val rightMost = right.mostRetweeted
+      getBestTweet(rightMost, elem)
+
+    // case when left and right are both empty
+    } else {
+      elem
+    }
+  }
+
+  def descendingByRetweet: TweetList = {
+    // get mostRetweeted, put it at the front of the list
+    // Then remove the most retweeted and recursively add on the
+    // remaining mostRetweeted
+    new Cons(mostRetweeted, remove(mostRetweeted).descendingByRetweet)
   }
 }
 
@@ -195,14 +231,26 @@ object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
 
-  lazy val googleTweets: TweetSet = ???
-  lazy val appleTweets: TweetSet = ???
+  def isAKeywordInThisTweet(keywordList: List[String], tweet: Tweet): Boolean = {
+    if (keywordList.isEmpty) false
+    else if (tweet.text.contains(keywordList.head)) true
+    else isAKeywordInThisTweet(keywordList.tail, tweet)
+  }
+
+  lazy val googleTweets: TweetSet = allTweets.filterAcc(
+                                      (tweet) => isAKeywordInThisTweet(google, tweet),
+                                      new Empty()
+                                    )
+  lazy val appleTweets: TweetSet = allTweets.filterAcc(
+                                     (tweet) => isAKeywordInThisTweet(apple, tweet),
+                                     new Empty()
+                                   )
 
   /**
    * A list of all tweets mentioning a keyword from either apple or google,
    * sorted by the number of retweets.
    */
-  lazy val trending: TweetList = ???
+  lazy val trending: TweetList = googleTweets.union(appleTweets).descendingByRetweet
 }
 
 object Main extends App {
