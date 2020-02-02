@@ -109,7 +109,7 @@ abstract class TweetSet extends TweetSetInterface {
 }
 
 class Empty extends TweetSet {
-  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = new Empty()
+  def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = acc
 
   /**
    * The following methods are already implemented
@@ -131,10 +131,10 @@ class Empty extends TweetSet {
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
-    println(acc)
-    this.foreach((x) => if (p(x) && !acc.contains(x)) acc.incl(x))
-    println(acc)
-    acc
+    // return filter acc applied to left side and right side
+    // if p(elem) evaluates to true, include elem in the accumulator
+    if (p(elem)) left.filterAcc(p, right.filterAcc(p, acc)).incl(elem)
+    else left.filterAcc(p, right.filterAcc(p, acc))
   }
 
 
