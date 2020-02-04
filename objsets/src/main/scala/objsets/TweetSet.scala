@@ -137,8 +137,8 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   }
 
   def union(that: TweetSet): TweetSet = {
-    println(this)
-    ((left union right) union that) incl elem
+    // see union discussion in forums: https://www.coursera.org/learn/progfun1/discussions/weeks/3/threads/AzJ-4CLYEeag6wpD-92Rcw
+    left union (right union (that incl elem))
   }
   /**
    * The following methods are already implemented
