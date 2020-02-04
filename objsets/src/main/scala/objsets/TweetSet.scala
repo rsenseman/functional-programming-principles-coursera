@@ -169,33 +169,35 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   def mostRetweeted: Tweet = {
     def getBestTweet(a: Tweet, b:Tweet) = if (a.retweets > b.retweets) a else b
 
-    if (left.isInstanceOf[NonEmpty]) {
-      val leftMost = left.mostRetweeted
-
-      // case when both left and right are non-empty
-      if (right.isInstanceOf[NonEmpty]) {
-        val rightMost = right.mostRetweeted
-
-        // case when right > left
-        if (rightMost.retweets > leftMost.retweets)
-          getBestTweet(rightMost, elem)
-
-        // case when right < left
-        else
-          getBestTweet(leftMost, elem)
-
-      // case when only left is non-empty
-      } else {
-        getBestTweet(leftMost, elem)
+    left match {
+      case l: NonEmpty => {
+        val leftMost = left.mostRetweeted
+        right match {
+          // case when both left and right are non-empty
+          case r: NonEmpty => {
+            val rightMost = right.mostRetweeted
+            getBestTweet(
+              getBestTweet(rightMost, leftMost),
+              elem
+            )
+          }
+          // case when only left is non-empty
+          case r: Empty => {
+            getBestTweet(leftMost, elem)
+          }
+        }
       }
-    // case when only right is non-empty
-    } else if (right.isInstanceOf[NonEmpty]) {
-      val rightMost = right.mostRetweeted
-      getBestTweet(rightMost, elem)
-
-    // case when left and right are both empty
-    } else {
-      elem
+      case l: Empty => {
+        right match {
+          // case when only right is non-empty
+          case r: NonEmpty => {
+            val rightMost = right.mostRetweeted
+            getBestTweet(rightMost, elem)
+          }
+          // case when left and right are both empty
+          case r: Empty => elem
+        }
+      }
     }
   }
 
