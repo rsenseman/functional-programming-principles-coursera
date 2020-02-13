@@ -1,4 +1,4 @@
-import week4.{Expr, Number, Sum}
+//import week4.{Expr, Number, Sum}
 
 abstract class Nat {
   def isZero: Boolean
@@ -24,10 +24,25 @@ object Zero extends Nat {
   def - (that: Nat) = if (that.isZero) this else throw new Error("No negative natural numbers")
 }
 
-def show(e: Expr): String = e match {
-    case Number(x) => x.toString()
-    case Sum(l, r) => show(l) + " + " + show(r)
-  }
+//def show(e: Expr): String = e match {
+//    case Number(x) => x.toString()
+//    case Sum(l, r) => show(l) + " + " + show(r)
+//  }
+//val a = new Number(5)
+//println(show(a))
 
-val a = new Number(5)
-println(show(a))
+def insert(x: Int, xs: List[Int]): List[Int] = xs match {
+  case List() => List(x)
+  case y :: ys => {
+    if (x < y) x :: xs
+    else y :: insert(x, ys)
+  }
+}
+
+def isort(xs: List[Int]): List[Int] = xs match {
+  case List() => List()
+  case y :: ys => insert(y, isort(ys))
+}
+
+val l = List(7, 9, 5, 2)
+println(isort(l))
