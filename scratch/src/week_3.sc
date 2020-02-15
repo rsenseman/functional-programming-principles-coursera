@@ -41,3 +41,9 @@ def getValue[T](inList: List[T], index: Int): T = {
   else if (index==0) inList.head
   else getValue(inList.tail, index-1)
 }
+
+//val a: Array[NonEmpty] = Array(new NonEmpty(1, Empty, Empty))
+//val b: Array[IntSet] = a
+//b(0) = Empty
+//val s: NonEmpty = a(0)
+//println(s)
