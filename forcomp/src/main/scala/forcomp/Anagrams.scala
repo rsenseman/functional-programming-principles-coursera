@@ -192,7 +192,7 @@ object Anagrams extends AnagramsInterface {
    *  Note: There is only one anagram of an empty sentence.
    */
   def sentenceAnagrams(sentence: Sentence): List[Sentence] = {
-    // there are a lot of efficiency improvements to be made here; saving these for later 
+    // there are a lot of efficiency improvements to be made here; saving these for later
     def occurrenceAnagrams(sentenceOccurrenceList: Occurrences): List[Sentence] = {
       val anagramsList = for (combo <- combinations(sentenceOccurrenceList);
                               comboAnagram <- dictionaryByOccurrences getOrElse(combo, List());
